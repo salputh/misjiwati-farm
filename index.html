@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laporan Suhu Kandang</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-3 pb-5" style="max-width:600px;">
+
+  <h4 class="mb-1">Laporan Suhu &amp; Kondisi Kandang</h4>
+  <p class="text-muted small mb-3">Isi data, buat laporan, lalu salin ke WhatsApp.</p>
+
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#formTab" type="button">Form</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#historyTab" type="button">
+        Riwayat <span class="badge text-bg-secondary" id="historyCount">0</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- ===== FORM TAB ===== -->
+    <div class="tab-pane fade show active" id="formTab">
+      <form id="reportForm">
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">Waktu &amp; Cuaca</h6>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small">Tanggal</label>
+                <input type="date" id="tanggal" class="form-control" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Jam</label>
+                <input type="time" id="jam" class="form-control" required>
+              </div>
+            </div>
+            <label class="form-label small">Kondisi cuaca saat ini</label>
+            <select id="cuaca" class="form-select">
+              <option>Cerah</option>
+              <option selected>Berawan</option>
+              <option>Mendung</option>
+              <option>Hujan</option>
+              <option>Hujan Deras</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">1. Suhu Kandang Lantai Atas</h6>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Panel (°C)</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="atasPanel" class="form-control decimal-input" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Kelembapan (%)</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="atasLembap" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Depan</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="atasDepan" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Tengah</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="atasTengah" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Belakang</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="atasBelakang" class="form-control decimal-input" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">2. Suhu Kandang Lantai Bawah</h6>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Panel (°C)</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="bawahPanel" class="form-control decimal-input" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Kelembapan (%)</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="bawahLembap" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Depan</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="bawahDepan" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Tengah</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="bawahTengah" class="form-control decimal-input" required>
+              </div>
+              <div class="col-4">
+                <label class="form-label small">Belakang</label>
+                <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="bawahBelakang" class="form-control decimal-input" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">3. Kondisi Ayam</h6>
+            <label class="form-label small">Keterangan</label>
+            <input type="text" id="kondisiAyam" class="form-control" value="makan dan minum">
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">4. Ayam Mati</h6>
+
+            <div class="mb-3">
+              <div class="fw-semibold small mb-1">Malam</div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label small">Atas</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiMalamAtas" class="form-control" value="0">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small">Bawah</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiMalamBawah" class="form-control" value="0">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="fw-semibold small mb-1">Pagi</div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label small">Atas</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiPagiAtas" class="form-control" value="0">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small">Bawah</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiPagiBawah" class="form-control" value="0">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <div class="fw-semibold small mb-1">Siang</div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label small">Atas</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiSiangAtas" class="form-control" value="0">
+                </div>
+                <div class="col-6">
+                  <label class="form-label small">Bawah</label>
+                  <input type="number" min="0" step="1" inputmode="numeric" id="matiSiangBawah" class="form-control" value="0">
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between border-top pt-2 mt-1">
+              <span class="text-muted small">Grand Total</span>
+              <span class="fw-bold text-danger"><span id="grandTotalPreview">0</span> ekor</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">5. Estimasi Sisa Pakan</h6>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small">Persentase (%)</label>
+                <input type="number" min="0" max="100" step="1" inputmode="numeric" id="pakanPersen" class="form-control" value="20">
+              </div>
+              <div class="col-6">
+                <label class="form-label small">Setara (gram)</label>
+                <input type="number" min="0" step="1" inputmode="numeric" id="pakanGram" class="form-control" value="380">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted text-uppercase small">Keterangan Tambahan</h6>
+            <label class="form-label small">Suhu setting (°C)</label>
+            <input type="text" inputmode="decimal" pattern="^[0-9]*\.?[0-9]*$" id="suhuSet" class="form-control decimal-input" value="32.5">
+          </div>
+        </div>
+
+      </form>
+
+      <div class="d-grid mb-4">
+        <button type="button" id="generateBtn" class="btn btn-warning btn-lg fw-semibold">Buat Laporan</button>
+      </div>
+
+      <div id="outputSection" class="card mb-5 d-none">
+        <div class="card-body">
+          <h6 class="card-title mb-3">Hasil Laporan</h6>
+
+          <ul class="nav nav-pills nav-fill mb-3" id="outputModeTabs">
+            <li class="nav-item">
+              <button type="button" class="nav-link active" data-mode="teks">Teks</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" data-mode="gambar">Gambar</button>
+            </li>
+          </ul>
+
+          <div id="outputTeksPane">
+            <textarea id="outputText" class="form-control mb-2 font-monospace" rows="18" readonly></textarea>
+            <div class="d-grid">
+              <button type="button" id="copyBtn" class="btn btn-success">Salin ke WhatsApp</button>
+            </div>
+            <div class="form-text" id="copyHint">Ketuk tombol untuk menyalin, lalu tempel (paste) di grup WhatsApp.</div>
+          </div>
+
+          <div id="outputGambarPane" class="d-none">
+            <div class="d-flex justify-content-center bg-body-tertiary rounded-3 p-3 mb-3">
+              <div id="reportCard" class="report-card"></div>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="button" id="copyImageBtn" class="btn btn-success">Salin Gambar</button>
+              <button type="button" id="downloadImageBtn" class="btn btn-outline-secondary">Unduh Gambar</button>
+            </div>
+            <div class="form-text" id="copyImageHint">Ketuk "Salin Gambar" lalu tempel di WhatsApp. Kalau tidak berhasil, pakai "Unduh Gambar" lalu kirim sebagai foto, atau tekan lama gambar di atas untuk menyimpan.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HISTORY TAB ===== -->
+    <div class="tab-pane fade" id="historyTab">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="text-muted small">Tersimpan di HP/browser ini</span>
+        <button class="btn btn-sm btn-outline-danger" id="clearHistoryBtn">Hapus Semua</button>
+      </div>
+      <div id="historyList" class="list-group mb-3"></div>
+      <p id="historyEmpty" class="text-muted small">Belum ada riwayat laporan.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal riwayat -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="historyModalTitle">Laporan</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="historyModalText" class="form-control font-monospace" rows="18" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger me-auto" id="historyModalDelete">Hapus</button>
+        <button type="button" class="btn btn-success" id="historyModalCopy">Salin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

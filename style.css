@@ -1,0 +1,131 @@
+body {
+  background-color: #f5f6f5;
+}
+
+.card-subtitle {
+  letter-spacing: 0.04em;
+}
+
+#outputText,
+#historyModalText {
+  white-space: pre-wrap;
+}
+
+.list-group-item small {
+  display: block;
+}
+
+#copyBtn.copied,
+#copyImageBtn.copied {
+  background-color: #146c43;
+  border-color: #146c43;
+}
+
+/* ===== Kartu laporan (versi gambar) ===== */
+.report-card {
+  width: 380px;
+  max-width: 100%;
+  background: #ffffff;
+  color: #1c1c1c;
+  border-radius: 20px;
+  padding: 28px 22px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.06);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.report-card__title {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.report-card__subtitle {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.report-card__pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f6f4ee;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  margin-bottom: 22px;
+}
+
+.report-card__section-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 10px;
+}
+
+.report-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 22px;
+  font-size: 14px;
+}
+
+.report-card table th {
+  text-align: left;
+  font-weight: 400;
+  color: #6b7280;
+  font-size: 12.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ececec;
+}
+
+.report-card table td {
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.report-card table tr:last-child td {
+  border-bottom: none;
+}
+
+.report-card table th:not(:first-child),
+.report-card table td:not(:first-child) {
+  text-align: center;
+}
+
+.report-card table td:first-child {
+  font-weight: 600;
+}
+
+.report-card .grand-row td {
+  font-weight: 700;
+}
+
+.report-card .grand-row td.total-value {
+  color: #b3261e;
+}
+
+.report-card__feed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f6f4ee;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  margin-bottom: 16px;
+}
+
+.report-card__feed strong {
+  font-size: 15px;
+}
+
+.report-card__footer {
+  text-align: center;
+  color: #8b8b8b;
+  font-size: 13px;
+  margin: 0;
+}
