@@ -486,6 +486,24 @@ document.getElementById("downloadImageBtn").addEventListener("click", async () =
   }
 });
 
+// ===== Event: Selesai (kosongkan form untuk laporan berikutnya) =====
+document.getElementById("doneBtn").addEventListener("click", () => {
+  document.getElementById("reportForm").reset();
+  setDefaultDateTime();
+  updateTotals();
+
+  document.getElementById("outputSection").classList.add("d-none");
+  document.getElementById("outputText").value = "";
+  document.getElementById("reportCard").innerHTML = "";
+
+  document.querySelectorAll("#outputModeTabs .nav-link").forEach((b) => b.classList.remove("active"));
+  document.querySelector('#outputModeTabs .nav-link[data-mode="teks"]').classList.add("active");
+  document.getElementById("outputTeksPane").classList.remove("d-none");
+  document.getElementById("outputGambarPane").classList.add("d-none");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
 // ===== Event: pemisah desimal selalu titik =====
 document.querySelectorAll(".decimal-input").forEach((el) => {
   el.addEventListener("input", sanitizeDecimalInput);
