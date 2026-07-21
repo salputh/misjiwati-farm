@@ -18,6 +18,14 @@ const FIELDS_NOT_REMEMBERED = new Set([
   "matiMalamAtas", "matiMalamBawah", "matiPagiAtas", "matiPagiBawah", "matiSiangAtas", "matiSiangBawah"
 ]);
 
+// Field angka yang harus kembali ke 0 saat form dikosongkan (tombol "Selesai")
+const ZERO_RESET_IDS = [
+  "atasPanel", "atasDepan", "atasTengah", "atasBelakang", "atasLembap",
+  "bawahPanel", "bawahDepan", "bawahTengah", "bawahBelakang", "bawahLembap",
+  "matiMalamAtas", "matiMalamBawah", "matiPagiAtas", "matiPagiBawah", "matiSiangAtas", "matiSiangBawah",
+  "pakanPersen", "pakanGram", "suhuSet"
+];
+
 // ===== Helper =====
 function pad2(n) {
   return String(n).padStart(2, "0");
@@ -489,6 +497,9 @@ document.getElementById("downloadImageBtn").addEventListener("click", async () =
 // ===== Event: Selesai (kosongkan form untuk laporan berikutnya) =====
 document.getElementById("doneBtn").addEventListener("click", () => {
   document.getElementById("reportForm").reset();
+  ZERO_RESET_IDS.forEach((id) => {
+    document.getElementById(id).value = "0";
+  });
   setDefaultDateTime();
   updateTotals();
 
