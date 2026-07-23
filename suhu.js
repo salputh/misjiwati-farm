@@ -1,9 +1,10 @@
 // ===== Konstanta =====
 const FORM_STORAGE_KEY = "laporanSuhu.form";
-const HISTORY_STORAGE_KEY = "laporanSuhu.history";
+const SUHU_API_BASE = "/api/suhu";
 const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
 
 const FIELD_IDS = [
+  "kandang", "usiaAyam",
   "tanggal", "jam", "cuaca",
   "atasPanel", "atasDepan", "atasTengah", "atasBelakang", "atasLembap",
   "bawahPanel", "bawahDepan", "bawahTengah", "bawahBelakang", "bawahLembap",
@@ -12,14 +13,22 @@ const FIELD_IDS = [
   "pakanPersen", "pakanGram", "suhuSet"
 ];
 
+const loadingOverlay = document.getElementById("loadingOverlay");
+const loadingText = document.getElementById("loadingText");
+const MIN_LOADING_MS = 700;
+let loadingDepth = 0;
+let loadingShownAt = 0;
+
 // Field yang tidak dibawa ke pengisian berikutnya (harus diisi ulang tiap laporan)
 const FIELDS_NOT_REMEMBERED = new Set([
+  "kandang",
   "tanggal", "jam",
   "matiMalamAtas", "matiMalamBawah", "matiPagiAtas", "matiPagiBawah", "matiSiangAtas", "matiSiangBawah"
 ]);
 
 // Field angka yang harus kembali ke 0 saat form dikosongkan (tombol "Selesai")
 const ZERO_RESET_IDS = [
+  "usiaAyam",
   "atasPanel", "atasDepan", "atasTengah", "atasBelakang", "atasLembap",
   "bawahPanel", "bawahDepan", "bawahTengah", "bawahBelakang", "bawahLembap",
   "matiMalamAtas", "matiMalamBawah", "matiPagiAtas", "matiPagiBawah", "matiSiangAtas", "matiSiangBawah",
@@ -45,6 +54,41 @@ function temp(id) {
 
 function pct(id) {
   return num(id).toFixed(1);
+}
+
+function showLoading(message) {
+  if (loadingDepth === 0) loadingShownAt = Date.now();
+  loadingDepth++;
+  if (!loadingOverlay) return;
+  loadingText.textContent = message || "Memproses data...";
+  loadingOverlay.hidden = false;
+  loadingOverlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("loading-active");
+}
+
+async function hideLoading() {
+  loadingDepth = Math.max(loadingDepth - 1, 0);
+  if (!loadingOverlay || loadingDepth > 0) return;
+  const remaining = Math.max(MIN_LOADING_MS - (Date.now() - loadingShownAt), 0);
+  if (remaining > 0) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, remaining);
+    });
+    if (loadingDepth > 0) return;
+  }
+  loadingOverlay.hidden = true;
+  loadingOverlay.setAttribute("aria-hidden", "true");
+  loadingText.textContent = "Menyimpan data...";
+  document.body.classList.remove("loading-active");
+}
+
+async function withLoading(message, task) {
+  showLoading(message);
+  try {
+    return await task();
+  } finally {
+    await hideLoading();
+  }
 }
 
 // Field suhu/kelembapan: paksa pemisah desimal pakai titik (.), bukan koma (,)
@@ -139,8 +183,10 @@ function buildReportText() {
   const totals = updateTotals();
   const lines = [
     "*_Lap.kondisi cuaca dan suhu:_*",
+    `Kandang: *_${val("kandang")}_*`,
     formatTanggal(),
     `Jam: ${formatJam()} wib`,
+    `Usia ayam: ${num("usiaAyam")} hari`,
     `-kondisi cuaca saat ini: *_${val("cuaca")}_*`,
     `1. Suhu kandang lantai atas ${temp("atasPanel")}°(panel)`,
     `* suhu bagian depan ${temp("atasDepan")}°`,
@@ -196,8 +242,8 @@ function buildReportCardHTML() {
   const icon = WEATHER_ICONS[cuaca] || "☁️";
 
   return `
-    <p class="report-card__title">Laporan kondisi cuaca dan suhu</p>
-    <p class="report-card__subtitle">${formatTanggalKartu()}</p>
+    <p class="report-card__title">Laporan kondisi cuaca dan suhu — ${val("kandang")}</p>
+    <p class="report-card__subtitle">${formatTanggalKartu()} &middot; Usia ${num("usiaAyam")} hari</p>
 
     <div class="report-card__pill">
       <span>${icon}</span>
@@ -271,40 +317,48 @@ function buildReportCardHTML() {
   `;
 }
 
-// ===== Riwayat (history) =====
-function loadHistory() {
-  const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
-  if (!raw) return [];
+// ===== Riwayat (database JSON di server) =====
+async function loadHistory() {
   try {
-    return JSON.parse(raw);
+    const res = await fetch(SUHU_API_BASE);
+    if (!res.ok) throw new Error("Gagal memuat riwayat dari server.");
+    return await res.json();
   } catch (e) {
+    console.error(e);
     return [];
   }
 }
 
-function saveHistory(list) {
-  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
-}
-
-function addHistoryEntry(text, totals) {
-  const list = loadHistory();
-  list.unshift({
-    id: Date.now(),
+async function addHistoryEntry(text, totals) {
+  const entry = {
+    kandang: val("kandang"),
+    usiaAyam: num("usiaAyam"),
     tanggal: val("tanggal"),
     jam: val("jam"),
     cuaca: val("cuaca"),
     grandTotal: totals.grand,
     suhuSet: temp("suhuSet"),
     text: text
+  };
+  const res = await fetch(SUHU_API_BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
   });
-  saveHistory(list);
-  renderHistory();
+  if (!res.ok) throw new Error("Gagal menyimpan laporan ke server.");
+  await renderHistory();
 }
 
-function deleteHistoryEntry(id) {
-  const list = loadHistory().filter((item) => item.id !== id);
-  saveHistory(list);
-  renderHistory();
+async function deleteHistoryEntry(id) {
+  const res = await fetch(SUHU_API_BASE + "/" + encodeURIComponent(id), { method: "DELETE" });
+  if (!res.ok) throw new Error("Gagal menghapus laporan di server.");
+  await renderHistory();
+}
+
+async function clearAllHistory() {
+  const res = await fetch(SUHU_API_BASE, { method: "DELETE" });
+  if (!res.ok) throw new Error("Gagal menghapus semua riwayat di server.");
+  await renderHistory();
 }
 
 function formatHistoryLabel(item) {
@@ -312,8 +366,8 @@ function formatHistoryLabel(item) {
   return `${d}-${m}-${y} ${item.jam.replace(":", ".")}`;
 }
 
-function renderHistory() {
-  const list = loadHistory();
+async function renderHistory() {
+  const list = await loadHistory();
   const listEl = document.getElementById("historyList");
   const emptyEl = document.getElementById("historyEmpty");
   const countEl = document.getElementById("historyCount");
@@ -333,10 +387,10 @@ function renderHistory() {
     btn.className = "list-group-item list-group-item-action";
     btn.innerHTML = `
       <div class="d-flex justify-content-between align-items-center">
-        <strong>${formatHistoryLabel(item)}</strong>
+        <strong>${item.kandang ? item.kandang + " — " : ""}${formatHistoryLabel(item)}</strong>
         <span class="badge text-bg-danger">${item.grandTotal} mati</span>
       </div>
-      <small class="text-muted">Cuaca: ${item.cuaca} &middot; Suhu set: ${item.suhuSet}°</small>
+      <small class="text-muted">Usia: ${item.usiaAyam != null ? item.usiaAyam : "-"} hari &middot; Cuaca: ${item.cuaca} &middot; Suhu set: ${item.suhuSet}°</small>
     `;
     btn.addEventListener("click", () => openHistoryModal(item));
     listEl.appendChild(btn);
@@ -348,7 +402,7 @@ let historyModalInstance = null;
 
 function openHistoryModal(item) {
   activeHistoryId = item.id;
-  document.getElementById("historyModalTitle").textContent = `Laporan ${formatHistoryLabel(item)}`;
+  document.getElementById("historyModalTitle").textContent = `Laporan ${item.kandang ? item.kandang + " — " : ""}${formatHistoryLabel(item)}`;
   document.getElementById("historyModalText").value = item.text;
   if (!historyModalInstance) {
     historyModalInstance = new bootstrap.Modal(document.getElementById("historyModal"));
@@ -377,61 +431,28 @@ function copyViaTextarea(textareaEl) {
 }
 
 // ===== Event: Buat Laporan =====
-document.getElementById("generateBtn").addEventListener("click", () => {
+document.getElementById("generateBtn").addEventListener("click", async () => {
   const form = document.getElementById("reportForm");
   if (!form.reportValidity()) return;
 
   saveFormValues();
   const { text, totals } = buildReportText();
 
-  const outputText = document.getElementById("outputText");
-  outputText.value = text;
   document.getElementById("reportCard").innerHTML = buildReportCardHTML();
   document.getElementById("outputSection").classList.remove("d-none");
   document.getElementById("outputSection").scrollIntoView({ behavior: "smooth", block: "start" });
-
-  const copyBtn = document.getElementById("copyBtn");
-  copyBtn.classList.remove("copied");
-  copyBtn.textContent = "Salin ke WhatsApp";
 
   const copyImageBtn = document.getElementById("copyImageBtn");
   copyImageBtn.classList.remove("copied");
   copyImageBtn.textContent = "Salin Gambar";
 
-  addHistoryEntry(text, totals);
-});
-
-// ===== Event: Salin hasil laporan =====
-document.getElementById("copyBtn").addEventListener("click", async () => {
-  const outputText = document.getElementById("outputText");
-  const btn = document.getElementById("copyBtn");
-  const hint = document.getElementById("copyHint");
-
-  let copied = await copyText(outputText.value);
-  if (!copied) copied = copyViaTextarea(outputText);
-
-  if (copied) {
-    btn.classList.add("copied");
-    btn.textContent = "Tersalin ✓";
-    hint.textContent = "Teks sudah disalin. Buka WhatsApp lalu tempel (paste) di grup.";
-    setTimeout(() => {
-      btn.classList.remove("copied");
-      btn.textContent = "Salin ke WhatsApp";
-    }, 2500);
-  } else {
-    hint.textContent = "Tidak bisa menyalin otomatis. Teks sudah dipilih, tekan lama lalu pilih Salin.";
+  try {
+    await withLoading("Menyimpan laporan suhu...", async () => {
+      await addHistoryEntry(text, totals);
+    });
+  } catch (e) {
+    alert("Laporan berhasil dibuat, tapi gagal disimpan ke server. Cek koneksi lalu buat ulang laporan.");
   }
-});
-
-// ===== Event: ganti tampilan Teks / Gambar =====
-document.querySelectorAll("#outputModeTabs .nav-link").forEach((tabBtn) => {
-  tabBtn.addEventListener("click", () => {
-    document.querySelectorAll("#outputModeTabs .nav-link").forEach((b) => b.classList.remove("active"));
-    tabBtn.classList.add("active");
-    const mode = tabBtn.dataset.mode;
-    document.getElementById("outputTeksPane").classList.toggle("d-none", mode !== "teks");
-    document.getElementById("outputGambarPane").classList.toggle("d-none", mode !== "gambar");
-  });
 });
 
 // ===== Render kartu laporan menjadi gambar PNG =====
@@ -504,13 +525,7 @@ document.getElementById("doneBtn").addEventListener("click", () => {
   updateTotals();
 
   document.getElementById("outputSection").classList.add("d-none");
-  document.getElementById("outputText").value = "";
   document.getElementById("reportCard").innerHTML = "";
-
-  document.querySelectorAll("#outputModeTabs .nav-link").forEach((b) => b.classList.remove("active"));
-  document.querySelector('#outputModeTabs .nav-link[data-mode="teks"]').classList.add("active");
-  document.getElementById("outputTeksPane").classList.remove("d-none");
-  document.getElementById("outputGambarPane").classList.add("d-none");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
@@ -534,20 +549,42 @@ document.getElementById("historyModalCopy").addEventListener("click", async () =
   setTimeout(() => { btn.textContent = "Salin"; }, 2000);
 });
 
-document.getElementById("historyModalDelete").addEventListener("click", () => {
+document.getElementById("historyModalDelete").addEventListener("click", async () => {
   if (activeHistoryId === null) return;
-  if (confirm("Hapus laporan ini dari riwayat?")) {
-    deleteHistoryEntry(activeHistoryId);
+  const confirmed = await window.showConfirmDialog({
+    title: "Hapus Laporan Suhu",
+    message: "Laporan suhu yang dihapus akan hilang dari riwayat semua kandang. Lanjut hapus?",
+    confirmText: "Ya, Hapus",
+    cancelText: "Batal",
+  });
+  if (!confirmed) return;
+  try {
+    await withLoading("Menghapus laporan dari riwayat...", async () => {
+      await deleteHistoryEntry(activeHistoryId);
+    });
     historyModalInstance.hide();
+  } catch (e) {
+    alert("Gagal menghapus laporan di server. Coba lagi.");
   }
 });
 
 // ===== Event: hapus semua riwayat =====
-document.getElementById("clearHistoryBtn").addEventListener("click", () => {
-  if (loadHistory().length === 0) return;
-  if (confirm("Hapus semua riwayat laporan di HP ini?")) {
-    saveHistory([]);
-    renderHistory();
+document.getElementById("clearHistoryBtn").addEventListener("click", async () => {
+  const list = await loadHistory();
+  if (list.length === 0) return;
+  const confirmed = await window.showConfirmDialog({
+    title: "Hapus Semua Riwayat",
+    message: "Semua riwayat laporan untuk seluruh kandang akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.",
+    confirmText: "Ya, Hapus Semua",
+    cancelText: "Batal",
+  });
+  if (!confirmed) return;
+  try {
+    await withLoading("Menghapus semua riwayat laporan...", async () => {
+      await clearAllHistory();
+    });
+  } catch (e) {
+    alert("Gagal menghapus semua riwayat di server. Coba lagi.");
   }
 });
 

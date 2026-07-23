@@ -128,6 +128,22 @@ h4 {
   --bs-btn-focus-shadow-rgb: 14, 165, 233;
 }
 
+/* Tombol "Selesai" — solid teal (biru-hijau) supaya tetap kontras di atas
+   kartu putih/glass (bukan gaya outline putih-di-atas-putih seperti
+   .btn-outline-secondary yang dipakai untuk tombol di atas gradient). */
+.btn-teal {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #0d9488;
+  --bs-btn-border-color: #0d9488;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #0f766e;
+  --bs-btn-hover-border-color: #0f766e;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #0f766e;
+  --bs-btn-active-border-color: #0f766e;
+  --bs-btn-focus-shadow-rgb: 13, 148, 136;
+}
+
 .btn-outline-secondary {
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.5);
@@ -137,6 +153,21 @@ h4 {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Untuk tombol outline yang berada di atas kartu putih/glass (bukan langsung
+   di atas gradient) — .btn-outline-secondary di atas sengaja putih pudar,
+   jadi tak kelihatan di kartu putih. */
+.btn-outline-oncard {
+  color: var(--text-muted);
+  border-color: var(--border);
+  background: transparent;
+}
+
+.btn-outline-oncard:hover {
+  background: rgba(31, 36, 48, 0.06);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 .list-group-item {
@@ -155,12 +186,10 @@ h4 {
   backdrop-filter: blur(var(--glass-blur));
 }
 
-#outputText,
 #historyModalText {
   white-space: pre-wrap;
 }
 
-#copyBtn.copied,
 #copyImageBtn.copied {
   background-color: var(--accent2-dark);
   border-color: var(--accent2-dark);

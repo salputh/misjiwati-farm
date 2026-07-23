@@ -1,0 +1,12 @@
+{
+  "name": "kandang-suite-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Server kecil untuk Kandang Suite: menyimpan data Sampel Bobot Ayam & Laporan Suhu ke satu database JSON bersama.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

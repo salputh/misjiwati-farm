@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "sampelRiwayat";
+  const API_BASE = "/api/sampel";
 
   const lantaiContainer = document.getElementById("lantaiContainer");
   const emptyLantaiMsg = document.getElementById("emptyLantaiMsg");
@@ -9,6 +9,7 @@
 
   const kandangInput = document.getElementById("kandangInput");
   const tanggalInput = document.getElementById("tanggalInput");
+  const usiaInput = document.getElementById("usiaInput");
   const ekorInput = document.getElementById("ekorInput");
   const ekorJantanInput = document.getElementById("ekorJantanInput");
   const ekorBetinaInput = document.getElementById("ekorBetinaInput");
@@ -30,10 +31,15 @@
 
   const historyBody = document.getElementById("historyBody");
   const emptyHistoryMsg = document.getElementById("emptyHistoryMsg");
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  const loadingText = document.getElementById("loadingText");
 
   let lantaiCounter = 0;
   let editingId = null;
   let currentMode = "campuran"; // 'campuran' | 'kelamin'
+  const MIN_LOADING_MS = 700;
+  let loadingDepth = 0;
+  let loadingShownAt = 0;
 
   function todayStr() {
     return new Date().toISOString().slice(0, 10);
@@ -50,6 +56,41 @@
     const div = document.createElement("div");
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function showLoading(message) {
+    if (loadingDepth === 0) loadingShownAt = Date.now();
+    loadingDepth++;
+    if (!loadingOverlay) return;
+    loadingText.textContent = message || "Memproses data...";
+    loadingOverlay.hidden = false;
+    loadingOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("loading-active");
+  }
+
+  async function hideLoading() {
+    loadingDepth = Math.max(loadingDepth - 1, 0);
+    if (!loadingOverlay || loadingDepth > 0) return;
+    const remaining = Math.max(MIN_LOADING_MS - (Date.now() - loadingShownAt), 0);
+    if (remaining > 0) {
+      await new Promise(function (resolve) {
+        setTimeout(resolve, remaining);
+      });
+      if (loadingDepth > 0) return;
+    }
+    loadingOverlay.hidden = true;
+    loadingOverlay.setAttribute("aria-hidden", "true");
+    loadingText.textContent = "Menyimpan data...";
+    document.body.classList.remove("loading-active");
+  }
+
+  async function withLoading(message, task) {
+    showLoading(message);
+    try {
+      return await task();
+    } finally {
+      await hideLoading();
+    }
   }
 
   // ---------- Mode switching ----------
@@ -321,6 +362,7 @@
       jenisSampel: currentMode,
       kandang: kandangInput.value.trim(),
       tanggal: tanggalInput.value,
+      usia: parseFloat(usiaInput.value) || 0,
       ekorPerSampel: parseFloat(ekorInput.value) || 0,
       ekorJantan: parseFloat(ekorJantanInput.value) || 0,
       ekorBetina: parseFloat(ekorBetinaInput.value) || 0,
@@ -333,6 +375,7 @@
 
     kandangInput.value = data.kandang || "";
     tanggalInput.value = data.tanggal || todayStr();
+    usiaInput.value = data.usia || data.usia === 0 ? data.usia : "";
     ekorInput.value = data.ekorPerSampel || 20;
     // Fall back to the shared ekorPerSampel for records saved before jantan/betina had separate counts.
     ekorJantanInput.value = data.ekorJantan || data.ekorPerSampel || 20;
@@ -349,6 +392,7 @@
   function resetForm() {
     kandangInput.value = "";
     tanggalInput.value = todayStr();
+    usiaInput.value = "";
     ekorInput.value = 20;
     ekorJantanInput.value = 20;
     ekorBetinaInput.value = 20;
@@ -357,18 +401,32 @@
     setMode("campuran", { silent: true, force: true });
   }
 
-  // ---------- History (localStorage) ----------
+  // ---------- History (database JSON di server) ----------
 
-  function loadHistoryList() {
+  async function loadHistoryList() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      const res = await fetch(API_BASE);
+      if (!res.ok) throw new Error("Gagal memuat riwayat dari server.");
+      return await res.json();
     } catch (e) {
+      console.error(e);
       return [];
     }
   }
 
-  function saveHistoryList(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  async function saveRecordToServer(record) {
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!res.ok) throw new Error("Gagal menyimpan ke server.");
+    return res.json();
+  }
+
+  async function deleteRecordOnServer(id) {
+    const res = await fetch(API_BASE + "/" + encodeURIComponent(id), { method: "DELETE" });
+    if (!res.ok) throw new Error("Gagal menghapus di server.");
   }
 
   function historyRowMetrics(rec) {
@@ -391,8 +449,8 @@
     };
   }
 
-  function renderHistoryTable() {
-    const list = loadHistoryList();
+  async function renderHistoryTable() {
+    const list = await loadHistoryList();
     historyBody.innerHTML = "";
 
     list
@@ -406,6 +464,7 @@
         tr.innerHTML =
           "<td>" + escapeHtml(rec.tanggal || "-") + "</td>" +
           "<td>" + escapeHtml(rec.kandang || "-") + "</td>" +
+          "<td>" + (rec.usia || rec.usia === 0 ? rec.usia : "-") + "</td>" +
           "<td>" + escapeHtml(m.jenisLabel) + "</td>" +
           "<td>" + m.jumlahLine + "</td>" +
           "<td>" + m.totalEkor + "</td>" +
@@ -416,7 +475,7 @@
           '<button type="button" class="btn btn-danger btn-small delete-record-btn">Hapus</button></td>';
 
         tr.querySelector(".edit-record-btn").addEventListener("click", function () {
-          editRecord(rec.id);
+          editRecord(rec);
         });
         tr.querySelector(".image-record-btn").addEventListener("click", function () {
           showImagePreview(rec);
@@ -431,7 +490,7 @@
     emptyHistoryMsg.classList.toggle("hidden", list.length > 0);
   }
 
-  function saveToHistory() {
+  async function saveToHistory() {
     const data = collectFormData();
 
     if (!data.kandang) {
@@ -444,41 +503,49 @@
     }
 
     const summary = recalcAll();
-    const list = loadHistoryList();
+    const record = Object.assign({}, data, { summary: summary });
+    if (editingId) record.id = editingId;
 
-    if (editingId) {
-      const idx = list.findIndex(function (r) { return r.id === editingId; });
-      if (idx !== -1) {
-        list[idx] = Object.assign({}, list[idx], data, { summary: summary });
-      }
-    } else {
-      list.push(Object.assign({}, data, { id: Date.now().toString(), summary: summary }));
+    saveBtn.disabled = true;
+    try {
+      await withLoading("Menyimpan riwayat sampel...", async function () {
+        await saveRecordToServer(record);
+        await renderHistoryTable();
+      });
+      resetForm();
+    } catch (e) {
+      alert("Gagal menyimpan ke server. Pastikan koneksi ke server masih aktif, lalu coba lagi.");
+    } finally {
+      saveBtn.disabled = false;
     }
-
-    saveHistoryList(list);
-    renderHistoryTable();
-    resetForm();
   }
 
-  function editRecord(id) {
-    const list = loadHistoryList();
-    const rec = list.find(function (r) { return r.id === id; });
-    if (!rec) return;
-
+  function editRecord(rec) {
     loadFormData(rec);
-    editingId = id;
+    editingId = rec.id;
     editBannerLabel.textContent = (rec.kandang || "-") + " (" + (rec.tanggal || "-") + ")";
     editBanner.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function deleteRecord(id) {
-    if (!confirm("Hapus riwayat ini?")) return;
-    let list = loadHistoryList();
-    list = list.filter(function (r) { return r.id !== id; });
-    saveHistoryList(list);
+  async function deleteRecord(id) {
+    const confirmed = await window.showConfirmDialog({
+      title: "Hapus Riwayat Sampel",
+      message: "Riwayat sampel yang dihapus tidak bisa dikembalikan. Lanjut hapus data ini?",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+    if (!confirmed) return;
+    try {
+      await withLoading("Menghapus riwayat sampel...", async function () {
+        await deleteRecordOnServer(id);
+        await renderHistoryTable();
+      });
+    } catch (e) {
+      alert("Gagal menghapus di server. Coba lagi.");
+      return;
+    }
     if (editingId === id) resetForm();
-    renderHistoryTable();
   }
 
   // ---------- Image export ----------
@@ -622,7 +689,8 @@
     const ekorLabel = data.jenisSampel === "kelamin"
       ? "Ekor/Sampel — Jantan: " + (data.ekorJantan || 0) + ", Betina: " + (data.ekorBetina || 0)
       : "Ekor/Sampel: " + (data.ekorPerSampel || 0);
-    const pillLines = layoutPills(measureCtx, [data.kandang || "-", data.tanggal || "-", jenisLabel, ekorLabel], TABLE_W, PILL_FONT);
+    const usiaLabel = "Usia: " + (data.usia || 0) + " hari";
+    const pillLines = layoutPills(measureCtx, [data.kandang || "-", data.tanggal || "-", usiaLabel, jenisLabel, ekorLabel], TABLE_W, PILL_FONT);
     const pillsHeight = 8 + pillLines.length * PILL_H + (pillLines.length - 1) * 6 + 8;
 
     function buildLantaiColumnOps(l) {

@@ -1,0 +1,33 @@
+/* Tambahan kecil untuk halaman admin, di atas komponen bersama di sampel.css */
+
+.admin-filter-field {
+  min-width: 180px;
+}
+
+.admin-detail-text {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.85);
+  resize: vertical;
+}
+
+#sampelTable th, #sampelTable td,
+#suhuTable th, #suhuTable td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+#sampelTable thead th, #suhuTable thead th {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Rekap Data Kandang</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="sampel.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-text">
+    <h1>Admin — Rekap Data Kandang</h1>
+    <p class="subtitle">Semua data Sampel Bobot Ayam &amp; Laporan Suhu dari seluruh kandang, tersimpan di server.</p>
+  </div>
+  <a href="index.html" class="home-link">&larr; Beranda</a>
+</header>
+
+<main class="container">
+
+  <section class="card">
+    <div class="card-header-row">
+      <h2>Ringkasan</h2>
+      <div class="field admin-filter-field">
+        <label for="kandangFilter">Filter Kandang (semua tabel)</label>
+        <select id="kandangFilter">
+          <option value="">Semua Kandang</option>
+        </select>
+      </div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <span class="summary-label">Total Data Sampel</span>
+        <span class="summary-value" id="statTotalSampel">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Total Laporan Suhu</span>
+        <span class="summary-value" id="statTotalSuhu">0</span>
+      </div>
+      <div class="summary-item summary-highlight">
+        <span class="summary-label">Total Ayam Mati (semua laporan)</span>
+        <span class="summary-value" id="statTotalMati">0</span>
+      </div>
+    </div>
+    <button id="refreshBtn" type="button" class="btn btn-ghost btn-small">&#8635; Muat Ulang</button>
+  </section>
+
+  <section class="card">
+    <h2>Rekap Sampel Bobot Ayam</h2>
+    <div class="table-scroll">
+      <table id="sampelTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Kandang</th>
+            <th>Usia (hari)</th>
+            <th>Jenis Sampel</th>
+            <th>Jml Line</th>
+            <th>Total Ekor</th>
+            <th>Total Berat (kg)</th>
+            <th>ABW (gram)</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="sampelBody"></tbody>
+      </table>
+    </div>
+    <p id="emptySampelMsg" class="empty-msg">Belum ada data sampel.</p>
+  </section>
+
+  <section class="card">
+    <h2>Rekap Laporan Suhu &amp; Kondisi Kandang</h2>
+    <div class="table-scroll">
+      <table id="suhuTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Jam</th>
+            <th>Kandang</th>
+            <th>Usia (hari)</th>
+            <th>Cuaca</th>
+            <th>Total Mati</th>
+            <th>Suhu Set</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="suhuBody"></tbody>
+      </table>
+    </div>
+    <p id="emptySuhuMsg" class="empty-msg">Belum ada laporan suhu.</p>
+  </section>
+
+</main>
+
+<div id="detailOverlay" class="image-overlay hidden">
+  <div class="image-modal">
+    <div class="image-modal-header">
+      <h3 id="detailTitle">Laporan</h3>
+      <button id="closeDetailBtn" type="button" class="btn btn-ghost btn-small">Tutup</button>
+    </div>
+    <textarea id="detailText" class="admin-detail-text" rows="18" readonly></textarea>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay" role="status" aria-live="polite" aria-hidden="true" hidden>
+  <div class="loading-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <p id="loadingText" class="loading-text">Menyimpan data...</p>
+  </div>
+</div>
+
+<script src="confirm-dialog.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
