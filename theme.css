@@ -1,0 +1,68 @@
+/*
+  Shared visual language for the whole "Kandang Suite" (landing page +
+  sampel bobot ayam + laporan suhu). Each app keeps its own component CSS,
+  but pulls its colors and glass-card look from these variables so the two
+  feel like one product instead of two bolted-together tools.
+*/
+
+:root {
+  /* Bright, non-green brand accent (used for primary actions/highlights) */
+  --accent: #f97316;
+  --accent-dark: #c2410c;
+  --accent-soft: rgba(249, 115, 22, 0.14);
+  --accent-contrast: #ffffff;
+
+  /* Secondary accent for links / info tints */
+  --accent2: #0ea5e9;
+  --accent2-dark: #0369a1;
+  --accent2-soft: rgba(14, 165, 233, 0.14);
+
+  /* Backdrop gradient — indigo -> violet -> pink, deliberately not green */
+  --bg-grad-from: #4338ca;
+  --bg-grad-via: #7e22ce;
+  --bg-grad-to: #db2777;
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.70);
+  --glass-bg-strong: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --glass-blur: 18px;
+  --glass-shadow: 0 8px 32px rgba(31, 20, 60, 0.25);
+
+  /* Neutral text/surfaces inside glass cards */
+  --text: #1f2430;
+  --text-muted: #5b6472;
+  --border: rgba(31, 36, 48, 0.10);
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-alt: rgba(255, 255, 255, 0.55);
+
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.12);
+  --success: #16a34a;
+  --success-bg: rgba(22, 163, 74, 0.12);
+  --warn-bg: #fff4d6;
+  --warn-border: #f0c766;
+  --warn-text: #7a5b12;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+
+.app-gradient-bg {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.14), transparent 45%),
+    linear-gradient(135deg, var(--bg-grad-from) 0%, var(--bg-grad-via) 50%, var(--bg-grad-to) 100%);
+  background-attachment: fixed;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}

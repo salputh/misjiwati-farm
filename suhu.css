@@ -1,0 +1,276 @@
+/* ---------- Bootstrap re-theme: bright + glass, no green as primary ---------- */
+
+:root {
+  --bs-primary: var(--accent);
+  --bs-primary-rgb: 249, 115, 22;
+  --bs-warning: var(--accent);
+  --bs-warning-rgb: 249, 115, 22;
+  --bs-success: var(--accent2);
+  --bs-success-rgb: 14, 165, 233;
+  --bs-danger: var(--danger);
+  --bs-danger-rgb: 220, 38, 38;
+  --bs-border-radius: var(--radius-md);
+  --bs-border-radius-lg: var(--radius-lg);
+  --bs-border-radius-sm: var(--radius-sm);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(255, 255, 255, 0.14), transparent 45%),
+    linear-gradient(135deg, var(--bg-grad-from) 0%, var(--bg-grad-via) 50%, var(--bg-grad-to) 100%);
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.home-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+h4 {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.card {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.card .text-muted {
+  color: var(--text-muted) !important;
+}
+
+.card-subtitle {
+  letter-spacing: 0.04em;
+}
+
+.nav-tabs {
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-tabs .nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  border: none;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--accent-dark);
+  background: var(--glass-bg-strong);
+  border: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.nav-pills .nav-link {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.nav-pills .nav-link.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Bootstrap compiles .btn-* colors to literal hex values, so overriding
+   --bs-warning/--bs-success alone at :root does not reach them — the
+   per-component --bs-btn-* tokens must be set directly here instead. */
+.btn-warning {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--accent-dark);
+  --bs-btn-hover-border-color: var(--accent-dark);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--accent-dark);
+  --bs-btn-active-border-color: var(--accent-dark);
+  --bs-btn-focus-shadow-rgb: 249, 115, 22;
+}
+
+.btn-success {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--accent2);
+  --bs-btn-border-color: var(--accent2);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--accent2-dark);
+  --bs-btn-hover-border-color: var(--accent2-dark);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--accent2-dark);
+  --bs-btn-active-border-color: var(--accent2-dark);
+  --bs-btn-focus-shadow-rgb: 14, 165, 233;
+}
+
+.btn-outline-secondary {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.list-group-item {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: var(--glass-border);
+}
+
+.list-group-item small {
+  display: block;
+}
+
+.modal-content {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+#outputText,
+#historyModalText {
+  white-space: pre-wrap;
+}
+
+#copyBtn.copied,
+#copyImageBtn.copied {
+  background-color: var(--accent2-dark);
+  border-color: var(--accent2-dark);
+}
+
+/* ===== Kartu laporan (versi gambar) ===== */
+.report-card {
+  width: 380px;
+  max-width: 100%;
+  background: #ffffff;
+  color: #1c1c1c;
+  border-radius: 20px;
+  padding: 28px 22px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.06);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.report-card__title {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.report-card__subtitle {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.report-card__pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f6f4ee;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  margin-bottom: 22px;
+}
+
+.report-card__section-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 10px;
+}
+
+.report-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 22px;
+  font-size: 14px;
+}
+
+.report-card table th {
+  text-align: left;
+  font-weight: 400;
+  color: #6b7280;
+  font-size: 12.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ececec;
+}
+
+.report-card table td {
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.report-card table tr:last-child td {
+  border-bottom: none;
+}
+
+.report-card table th:not(:first-child),
+.report-card table td:not(:first-child) {
+  text-align: center;
+}
+
+.report-card table td:first-child {
+  font-weight: 600;
+}
+
+.report-card .grand-row td {
+  font-weight: 700;
+}
+
+.report-card .grand-row td.total-value {
+  color: #b3261e;
+}
+
+.report-card__feed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f6f4ee;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  margin-bottom: 16px;
+}
+
+.report-card__feed strong {
+  font-size: 15px;
+}
+
+.report-card__footer {
+  text-align: center;
+  color: #8b8b8b;
+  font-size: 13px;
+  margin: 0;
+}

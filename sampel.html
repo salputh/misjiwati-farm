@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Sampel Bobot Ayam</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="sampel.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-text">
+    <h1>Kalkulator Sampel Bobot Ayam</h1>
+    <p class="subtitle">Input sampel dalam <strong>kg</strong> &middot; ABW akhir otomatis dalam <strong>gram</strong></p>
+  </div>
+  <a href="index.html" class="home-link">&larr; Beranda</a>
+</header>
+
+<main class="container">
+
+  <div id="editBanner" class="edit-banner hidden">
+    Sedang mengedit riwayat: <strong id="editBannerLabel"></strong>
+    <button id="cancelEditBtn" type="button" class="btn btn-ghost btn-small">Batal Edit</button>
+  </div>
+
+  <section class="card">
+    <h2>Data Kandang</h2>
+    <div class="field mode-field">
+      <label>Jenis Sampel</label>
+      <div class="segmented" id="modeSegmented">
+        <button type="button" class="segmented-btn active" data-mode="campuran">Campuran (Semua Ayam)</button>
+        <button type="button" class="segmented-btn" data-mode="kelamin">Per Jenis Kelamin (Jantan &amp; Betina)</button>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="kandangInput">Nama / Nomor Kandang</label>
+        <input type="text" id="kandangInput" placeholder="Contoh: Kandang 1">
+      </div>
+      <div class="field">
+        <label for="tanggalInput">Tanggal Sampling</label>
+        <input type="date" id="tanggalInput">
+      </div>
+      <div class="field" id="ekorCampuranField">
+        <label for="ekorInput">Ekor per Sampel</label>
+        <input type="number" id="ekorInput" min="1" step="1" value="20">
+      </div>
+      <div class="field hidden" id="ekorJantanField">
+        <label for="ekorJantanInput">Ekor per Sampel (Jantan)</label>
+        <input type="number" id="ekorJantanInput" min="1" step="1" value="20">
+      </div>
+      <div class="field hidden" id="ekorBetinaField">
+        <label for="ekorBetinaInput">Ekor per Sampel (Betina)</label>
+        <input type="number" id="ekorBetinaInput" min="1" step="1" value="20">
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header-row">
+      <h2>Lantai &amp; Line</h2>
+      <button id="addLantaiBtn" type="button" class="btn btn-primary">+ Tambah Lantai</button>
+    </div>
+    <div id="lantaiContainer"></div>
+    <p id="emptyLantaiMsg" class="empty-msg">Belum ada lantai. Klik "+ Tambah Lantai" untuk mulai.</p>
+  </section>
+
+  <section class="card summary-card">
+    <h2>Ringkasan Hasil</h2>
+
+    <div id="summaryCampuran" class="summary-grid">
+      <div class="summary-item">
+        <span class="summary-label">Total Berat Keseluruhan (kg)</span>
+        <span class="summary-value" data-field="grandTotalKg">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Jumlah Line</span>
+        <span class="summary-value" data-field="jumlahLine">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Jumlah Titik Sampel</span>
+        <span class="summary-value" data-field="jumlahTitikSampel">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Total Ekor Tersampel</span>
+        <span class="summary-value" data-field="totalEkorTersampel">0</span>
+      </div>
+      <div class="summary-item summary-highlight">
+        <span class="summary-label">ABW per Ekor (gram)</span>
+        <span class="summary-value" data-field="abwGram">0</span>
+      </div>
+    </div>
+
+    <div id="summaryKelamin" class="gender-summary hidden">
+      <div class="gender-summary-panel">
+        <h3 class="gender-summary-title">Jantan</h3>
+        <div class="summary-grid" data-gender-summary="jantan">
+          <div class="summary-item">
+            <span class="summary-label">Total Berat (kg)</span>
+            <span class="summary-value" data-field="grandTotalKg">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Jumlah Line</span>
+            <span class="summary-value" data-field="jumlahLine">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Titik Sampel</span>
+            <span class="summary-value" data-field="jumlahTitikSampel">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Ekor</span>
+            <span class="summary-value" data-field="totalEkorTersampel">0</span>
+          </div>
+          <div class="summary-item summary-highlight">
+            <span class="summary-label">ABW (gram)</span>
+            <span class="summary-value" data-field="abwGram">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gender-summary-panel">
+        <h3 class="gender-summary-title">Betina</h3>
+        <div class="summary-grid" data-gender-summary="betina">
+          <div class="summary-item">
+            <span class="summary-label">Total Berat (kg)</span>
+            <span class="summary-value" data-field="grandTotalKg">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Jumlah Line</span>
+            <span class="summary-value" data-field="jumlahLine">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Titik Sampel</span>
+            <span class="summary-value" data-field="jumlahTitikSampel">0</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Ekor</span>
+            <span class="summary-value" data-field="totalEkorTersampel">0</span>
+          </div>
+          <div class="summary-item summary-highlight">
+            <span class="summary-label">ABW (gram)</span>
+            <span class="summary-value" data-field="abwGram">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button id="saveBtn" type="button" class="btn btn-primary">Simpan ke Riwayat</button>
+      <button id="copyImageBtn" type="button" class="btn btn-ghost">🖼️ Salin sebagai Gambar</button>
+      <button id="resetBtn" type="button" class="btn btn-ghost">Form Baru</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Riwayat Sampel</h2>
+    <div class="table-scroll">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Kandang</th>
+            <th>Jenis Sampel</th>
+            <th>Jml Line</th>
+            <th>Total Ekor</th>
+            <th>Total Berat (kg)</th>
+            <th>ABW (gram)</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+    <p id="emptyHistoryMsg" class="empty-msg">Belum ada riwayat tersimpan.</p>
+  </section>
+
+</main>
+
+<div id="imagePreviewOverlay" class="image-overlay hidden">
+  <div class="image-modal">
+    <div class="image-modal-header">
+      <h3>Gambar Rekap</h3>
+      <button id="closePreviewBtn" type="button" class="btn btn-ghost btn-small">Tutup</button>
+    </div>
+    <p id="imageStatusText" class="image-status"></p>
+    <div class="image-preview-scroll">
+      <img id="resultImagePreview" alt="Rekap hasil sampel">
+    </div>
+    <div class="action-row">
+      <a id="downloadImageBtn" class="btn btn-primary" download="rekap-sampel.png">Unduh Gambar</a>
+    </div>
+  </div>
+</div>
+
+<template id="lineRowTemplate">
+  <tr class="line-row">
+    <td><input type="text" class="line-name" placeholder="A"></td>
+    <td><input type="number" class="line-s1" step="0.001" min="0" placeholder="0"></td>
+    <td><input type="number" class="line-s2" step="0.001" min="0" placeholder="0"></td>
+    <td class="line-total">0</td>
+    <td><button type="button" class="btn btn-danger btn-small remove-line-btn">Hapus</button></td>
+  </tr>
+</template>
+
+<script src="sampel.js"></script>
+</body>
+</html>
