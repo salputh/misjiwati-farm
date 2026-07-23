@@ -132,7 +132,8 @@ body {
 
 input[type="text"],
 input[type="number"],
-input[type="date"] {
+input[type="date"],
+select {
   padding: 9px 11px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -144,7 +145,8 @@ input[type="date"] {
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: var(--primary);
   background: #fff;
