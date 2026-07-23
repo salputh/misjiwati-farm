@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const API_BASE = "/api/sampel";
+  const API_BASE = (window.API_ORIGIN || "") + "/api/sampel";
 
   const lantaiContainer = document.getElementById("lantaiContainer");
   const emptyLantaiMsg = document.getElementById("emptyLantaiMsg");

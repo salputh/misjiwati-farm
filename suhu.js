@@ -1,6 +1,6 @@
 // ===== Konstanta =====
 const FORM_STORAGE_KEY = "laporanSuhu.form";
-const SUHU_API_BASE = "/api/suhu";
+const SUHU_API_BASE = (window.API_ORIGIN || "") + "/api/suhu";
 const DAY_NAMES = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
 
 const FIELD_IDS = [

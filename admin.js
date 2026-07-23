@@ -92,8 +92,12 @@
     };
   }
 
+  function apiUrl(path) {
+    return (window.API_ORIGIN || "") + path;
+  }
+
   async function fetchJson(url) {
-    const res = await fetch(url);
+    const res = await fetch(apiUrl(url));
     if (!res.ok) throw new Error("Gagal memuat data dari server: " + url);
     return res.json();
   }
@@ -212,7 +216,7 @@
     if (!confirmed) return;
     try {
       await withLoading("Menghapus data sampel...", async function () {
-        const res = await fetch("/api/sampel/" + encodeURIComponent(id), { method: "DELETE" });
+        const res = await fetch(apiUrl("/api/sampel/" + encodeURIComponent(id)), { method: "DELETE" });
         if (!res.ok) throw new Error("Gagal menghapus data sampel.");
         await refresh();
       });
@@ -231,7 +235,7 @@
     if (!confirmed) return;
     try {
       await withLoading("Menghapus laporan suhu...", async function () {
-        const res = await fetch("/api/suhu/" + encodeURIComponent(id), { method: "DELETE" });
+        const res = await fetch(apiUrl("/api/suhu/" + encodeURIComponent(id)), { method: "DELETE" });
         if (!res.ok) throw new Error("Gagal menghapus laporan suhu.");
         await refresh();
       });

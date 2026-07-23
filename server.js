@@ -41,8 +41,28 @@ function withLock(task) {
   return result;
 }
 
+const ALLOWED_ORIGINS = (
+  process.env.ALLOWED_ORIGINS || "https://salputh.github.io"
+)
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 const app = express();
 app.use(express.json({ limit: "2mb" }));
+
+// Izinkan frontend statis (GitHub Pages) memanggil API ini dari origin lain.
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
 // ---------- Sampel Bobot Ayam ----------
 
