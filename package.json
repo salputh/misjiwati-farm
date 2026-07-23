@@ -2,11 +2,8 @@
   "name": "kandang-suite-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Server kecil untuk Kandang Suite: menyimpan data Sampel Bobot Ayam & Laporan Suhu ke satu database JSON bersama.",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "description": "Kandang Suite: menyimpan data Sampel Bobot Ayam & Laporan Suhu di Vercel Postgres lewat serverless functions (api/).",
   "dependencies": {
-    "express": "^4.19.2"
+    "@neondatabase/serverless": "^1.1.0"
   }
 }

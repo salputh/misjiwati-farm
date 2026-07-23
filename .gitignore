@@ -1,4 +1,5 @@
 .claude/
 .DS_Store
 node_modules/
-data/*.json
+.vercel
+.env*.local
